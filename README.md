@@ -2,5 +2,5 @@
 # FIRE
 
 Le README est un peu comme une notice explicative
-Ici on peut mettre un message pour dire les modifications apportées et à quoi ça sert
-cliquer sur commit pour sauvegarder les modifications
+
+donc à remplir à chaque fois qu'on fait quelque chose pour comprendre ce qu'on a modifié
