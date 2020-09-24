@@ -1,18 +1,6 @@
 # AnalyseDonneesMassives_ForestFires
 # FIRE
 
-rm(list = ls()) #  clean l'environnement global
-setwd("C:/Users/mimi/Desktop/M2/Analyse de données massives/projet")
-require(data.table)
-fire <- fread("fire.csv",
-              header = TRUE,
-              na.strings = "",
-              blank.lines.skip = TRUE
-              )
-dim(fire)
-head(fire)
-tables()
+Le README est un peu comme une notice explicative
 
-fire[1:10,]
-
-fire[, Shape := NULL]
+donc à remplir à chaque fois qu'on fait quelque chose pour comprendre ce qu'on a modifié
