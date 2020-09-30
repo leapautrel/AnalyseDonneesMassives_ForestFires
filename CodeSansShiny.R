@@ -50,3 +50,4 @@ m <- leaflet::setView(m, lng = -95, lat = 37, zoom = 3)
 m
 
 # Site utile pour faire ça : https://rgeomatic.hypotheses.org/550
+# test
