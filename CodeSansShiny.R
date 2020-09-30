@@ -19,14 +19,15 @@ fires_all <- fread(
 	header = TRUE,
 	sep = ";",
 	na.strings = "",
-	blank.lines.skip = T
+	blank.lines.skip = TRUE,
+	stringsAsFactors = TRUE
 )
 
 # Nettoyage du jeu de données ----
-fires <- fires_all[, c(20, 21, 25, 29, 31, 32)]
+## Sélection des 6 colonnes utiles (cause, lieu,)
+fires <- fires_all[, c(25, 20, 21, 29, 31, 32)]
 summary(fires)
-	# A faire : trouver comment passer la colonne 'cause' en facteur plutôt qu'en character
-	# fires[,3] <- as.factor(fires[,3]) # ne marche pas, met des NA partout
+
 
 # # Essai ggplot carte feux/USA ----
 # ## Contours de la carte (localisaton)
