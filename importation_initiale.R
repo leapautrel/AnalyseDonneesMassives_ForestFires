@@ -27,9 +27,12 @@ fires_all$fire_date <-
 					origin = paste(fires_all[, fire_year] - 1, "-12-31", sep = ""))
 
 fires_all$fire_month <- month(fires_all[, fire_date], TRUE)
+print(object.size(fires_all), units = 'Gb')
+names(fires_all)
 
-## Sélection des 6 colonnes utiles (cause, lieu,)
-fires <- fires_all[, c(25, 29, 31, 32, 36, 20, 41, 40)] 
+## Sélection des colonnes utiles (cause, lieu,)
+fires <- fires_all[, c(25, 29, 31, 32, 35, 20, 41, 40)] 
+
 
 ## Vérification du jeu de données
 summary(fires)
