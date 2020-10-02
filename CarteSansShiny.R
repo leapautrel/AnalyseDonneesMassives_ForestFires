@@ -104,9 +104,13 @@ class(states)
 summary(states@data)
 
 # On rajoute une colonne 'fires_count' dans chaque state
+		# d'abord, il faut faire un datatable pour compter le nb de feux par state
+# fires_bystate <- data.frame(summary(fires_vecdate[, state]))
+# state.name[grep(fires_bystate[,1], state.abb)]
+# fires_bystate
+# J'en suis là
 
-
-# on initialise des paramètres de couleur
+# on initialise des paramètres de classes (nombre, couleur)
 bins <- c(0, 10, 20, 50, 100, 200, 500, 1000, Inf)
 pal <- colorBin("YlOrRd", domain = states$density, bins = bins)
 
