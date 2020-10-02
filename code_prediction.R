@@ -11,8 +11,8 @@ require(nnet)
 
 
 # Set Working Directory ----
-setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier Lea
-# setwd("C:/Users/mimi/Desktop/M2/Analyse de données massives/projet") # Direction fichier Junyi
+# setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier Lea
+setwd("C:/Users/mimi/Desktop/M2/Analyse de données massives/projet") # Direction fichier Junyi
 
 # Importation ----
 fires_all <- fread(
@@ -26,7 +26,7 @@ fires_all <- fread(
 
 # Nettoyage du jeu de données ----
 ## Sélection des 6 colonnes utiles (cause, lieu,)
-fires <- fires_all[, c(25, 20, 21, 29, 31, 32)]
+fires <- fires_all[, c(25, 20, 29, 31, 32)]
 summary(fires)
 
 
@@ -38,57 +38,49 @@ head(fires_pred)
 head(summary(fires_pred))
 
 # on appelle les variables explicatives, la variable qu'on cherche a expliquer, Y, est stat_cause_descr
-x = fires_pred[, 2:6] 
+x = fires_pred[, 2:5] 
 y = fires_pred$stat_cause_descr
-
-
-### regarder le cafe pas le pig!!!!!!!!!!!!
 
 mod = multinom(stat_cause_descr~.,data = fires_pred)
 coef(mod)
 
 
+mod = multinom(stat_cause_descr~.,
+               data=fires_pred,
+               maxit=200) # ML fit of the logistic model #il converge ? 150 it?rations, d?viance apr?s cv 192.72
+coef(mod) # les valeurs des coeef impact?s en allant jusque'? la cv
+
+### Assessment of the fit  
+### en utilisan la d?viance expliqu?e, 
+### diff?rence entre d?viance du mod?le nul et la d?viance du mod?le avec toutes les variables
+
+deviance(mod)          # Residual deviance # 
+
+mod0 = multinom(stat_cause_descr~1,data=fires_pred) # ML fit of the null model
+deviance(mod0)-deviance(mod)                # Explained deviance
+
+### Observed versus fitted values
+### indicateurs plus graphiques 
+
+proba = fitted(mod)            # Estimated probabilities of each class
+observed_class = fires_pred$stat_cause_descr
+head(data.frame(round(proba,3),observed_class))
+
+# Confusion matrix
+
+fitted_class = predict(mod,type="class")  # Bayes rule pour chaque individu 
+# je peux calculer la proba q'uil provienne du site 1 2 etc. 
+#et il serait dans le site avec la plus grande proba
+head(fitted_class)
+
+confusion = table(observed_class,fitted_class)
+confusion
+
+rowSums(confusion)
+confusion_percentage = 100*confusion/outer(rowSums(confusion),rep(1,5))
+round(confusion_percentage,3)
 
 
 
 
 
-
-
-
-# # Essai ggplot carte feux/USA ----
-# ## Contours de la carte (localisaton)
-# usa <- c(
-# 	left = -127,
-# 	bottom = 24,
-# 	right = -64,
-# 	top = 49.3
-# )
-# 
-# ## Creation de la carte
-# usa_map <- ggmap::get_map(
-# 	location = usa,
-# 	zoom = 4,
-# 	messaging = FALSE)
-# 
-# ## Affichage de la carte
-# ggmap::ggmap(usa_map)
-
-
-
-# Essai leaflet carte ----
-m <- leaflet::leaflet() %>%
-	leaflet::addTiles() %>%
-	leaflet::setView(lng = -95, 
-									 lat = 37, 
-									 zoom = 3) %>%
-	addCircles(
-		lng = fires[, "longitude"],
-		lat = fires[, "latitude"],
-		color = (fires[, "stat_cause_descr"]),
-		fillOpacity = 1,
-		opacity = 1
-	)
-m
-
-# Site utile pour faire ça : https://rgeomatic.hypotheses.org/550
