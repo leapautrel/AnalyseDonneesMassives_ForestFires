@@ -3,6 +3,7 @@ rm(list = ls())
 
 # Importation des packages ----
 require (data.table)
+require (lubridate)
 
 # Set Working Directory ----
 setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier  GitHub Lea
@@ -20,15 +21,15 @@ fires_all <- fread(
 )
 
 # Nettoyage du jeu de données
-### A faire : modifier la date en format date
-new_date <- as.Date(all[, 20], origin = paste(all[, 18] - 1, "-12-31", sep = ""))
-## Sélection des 6 colonnes utiles (cause, lieu,)
-fires <- fires_all[, c(25, 20, 21, 29, 31, 32)] # adapter
+### Modifier la date en format date
+fires_all$fire_date <-
+	as.Date(fires_all[, discovery_doy], 
+					origin = paste(fires_all[, fire_year] - 1, "-12-31", sep = ""))
 
-## Modification des colonnes de types inadaptés
-### Modification de l'année en format factor
-# ne marche pas			
-# fires <- fires[ ,lapply(.SD, as.factor), by=fire_year]
+fires_all$fire_month <- month(fires_all[, fire_date], TRUE)
+
+## Sélection des 6 colonnes utiles (cause, lieu,)
+fires <- fires_all[, c(25, 29, 31, 32, 36, 20, 41, 40)] 
 
 ## Vérification du jeu de données
 summary(fires)
