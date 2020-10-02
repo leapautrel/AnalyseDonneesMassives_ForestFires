@@ -38,8 +38,8 @@ head(fires_pred)
 head(summary(fires_pred))
 
 # on appelle les variables explicatives, la variable qu'on cherche a expliquer, Y, est stat_cause_descr
-x = fires_pred[, 2:5] 
-y = fires_pred$stat_cause_descr
+# x = fires_pred[, 2:5] 
+# y = fires_pred$stat_cause_descr
 
 mod = multinom(stat_cause_descr~.,data = fires_pred)
 coef(mod)
@@ -77,8 +77,12 @@ confusion = table(observed_class,fitted_class)
 confusion
 
 rowSums(confusion)
+colSums(confusion)
 confusion_percentage = 100*confusion/outer(rowSums(confusion),rep(1,5))
 round(confusion_percentage,3)
+
+
+# faire la ligne avec une CV 
 
 
 
