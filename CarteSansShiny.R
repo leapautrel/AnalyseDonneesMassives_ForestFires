@@ -27,7 +27,7 @@ summary(fires)
 
 
 # On récupère le vecteur de 2 dates
-vecdates <- c("2005-01-01","2005-12-31")
+vecdates <- c("2005-01-01","2006-12-31")
 
 # On fait une sélection du tableau entre ces dates
 fires_vecdate <- copy(fires[which(fires[, fire_date] >= vecdates[1] &
@@ -52,48 +52,44 @@ pal <- leaflet::colorFactor(
 	domain = fires[, stat_cause_descr]
 )
 
+
 ## Carte
 # creation carte 1000 plus gros feux
 m <- leaflet::leaflet(fires_vecdate_1000) %>%
-	leaflet::addTiles()
+	leaflet::addTiles() %>%
+	
+	# Centrage de la carte
+	fitBounds(
+		lng1 = min(fires_vecdate_1000[, longitude]),
+		lat1 = min(fires_vecdate_1000[, latitude]),
+		lng2 = max(fires_vecdate_1000[, longitude]),
+		lat2 = max(fires_vecdate_1000[, latitude])
+	) %>%
+	
+	# ajout des cercles
+	leaflet::addCircleMarkers(
+		lng = fires_vecdate_1000[, longitude],
+		lat = fires_vecdate_1000[, latitude],
+		radius = fires_vecdate_1000[, fire_size] / 15000,
+		weight = 0.2,
+		stroke = T,
+		opacity = 100,
+		fill = T,
+		color = ~ pal(stat_cause_descr),
+		fillOpacity = 0.3
+	) %>%
+	
+	# ajout de la legende
+	addLegend(
+		"bottomright",
+		pal = pal,
+		values = ~ stat_cause_descr,
+		title = "Cause of the fire",
+		opacity = 0.5
+	)
 
-# # position carte (bof)
-# m <- leaflet::setView(
-# 	map = m,
-# 	lng = -95,
-# 	lat = 37,
-# 	zoom = 3
-# )
-
-# Centrage de la carte
-m <- fitBounds(map = m,
-							 lng1 = min(fires_vecdate_1000[, longitude]),
-							 lat1 = min(fires_vecdate_1000[, latitude]),
-							 lng2 = max(fires_vecdate_1000[, longitude]),
-							 lat2 = max(fires_vecdate_1000[, latitude]))
-
-# ajout des cercles
-m <- leaflet::addCircleMarkers(
-	map = m,
-	lng = fires_vecdate_1000[, longitude],
-	lat = fires_vecdate_1000[, latitude],
-	radius = fires_vecdate_1000[, fire_size] / 10000,
-	weight = 0.2,
-	stroke = T,
-	opacity = 100,
-	fill = T,
-	color = ~pal(stat_cause_descr),
-	fillOpacity = 0.3
-)
-
-# ajout de la legende
-addLegend(map = m,
-					"bottomright", 
-					pal = pal, 
-					values = ~stat_cause_descr,
-					title = "Cause of the fire",
-					opacity = 0.5
-)
+# Affichage carte
+m
 
 # Carte tous les feux ----
 
@@ -105,17 +101,23 @@ states <- geojsonio::geojson_read("https://raw.githubusercontent.com/PublicaMund
 states@data[,3] <- NULL
 
 # On rajoute une colonne 'fires_count' dans chaque state
+### Ajout des codes pou' DC et Puerto Rico aux listes state.abb / state.name
+state.abb <- append(state.abb, c("DC", "PR"))
+state.name <- append(state.name, c("District of Columbia", "Puerto Rico"))
+
 ### Passage de abb à name ('NY' -> 'New York')
 fires_vecdate$state <- state.name[match(fires_vecdate[, state], state.abb)]
+
 ### On fait un aggregate
 fires_vecdate_bystate <- fires_vecdate[, list(fire_count = .N),
-																			 by = list(state = state)]
-fires_vecdate_bystate
+																			 by = list(name = state)]
+fires_vecdate_bystate <- fires_vecdate_bystate[order (name)]
+
 ### On merge 'states' et 'fires_vecdate_bystate'
-states@data <- data.table::merge.data.table(x = states@data,
-																						y = fires_vecdate_bystate,
-																						by.x = "name",
-																						by.y = "state")
+states@data <- merge.data.frame(
+	x = states@data,
+	y = fires_vecdate_bystate,
+	by = "name")
 
 # on initialise des paramètres de classes (nombre, couleur)
 bins <- c(0, 20, 50, 100, 200, 500, 1000, 2000, 5000, Inf)
@@ -124,7 +126,7 @@ pal2 <- colorBin("YlOrRd", domain = states$fire_count, bins = bins)
 # on rajoute les labels
 labels <- sprintf(
 	"<strong>%s</strong><br/>%g fires",
-	states$name, states$fire_count
+	states@data[,1], states@data[,3]
 ) %>% lapply(htmltools::HTML)
 
 
@@ -171,3 +173,9 @@ m2 <- leaflet(states) %>%
 	)
 
 m2
+
+# ATTENTION IL Y A UN PROBLEME ICI
+# Décalage des états sur la carte de Puerto Rico jusqu'à Wyoming
+# par ex : lieu Puerto Rico -> Affichage Wyoming sur carte
+# Lieu Wyoming -> Affichage Wiscontin
+# etc
