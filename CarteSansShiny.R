@@ -5,7 +5,7 @@ rm(list = ls())
 require (data.table)	# adapté aux données massives
 # require(ggmap)			# essai 1 de carte (changé pour leaflet)
 require (leaflet) 		# Pour la carte 
-require(geojsonio)
+require(geojsonio)		# Pour les States
 
 
 # Set Working Directory ----
@@ -100,27 +100,32 @@ addLegend(map = m,
 # On importe un fichier "states"
 states <- geojsonio::geojson_read("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json",
 																	what = "sp")
-class(states)
-summary(states@data)
+
+# On supprime l'info 'density' parce qu'on s'en moque
+states@data[,3] <- NULL
 
 # On rajoute une colonne 'fires_count' dans chaque state
-		# d'abord, il faut faire un datatable pour compter le nb de feux par state
-# fires_bystate <- data.frame(summary(fires_vecdate[, state]))
-# state.name[grep(fires_bystate[,1], state.abb)]
-# fires_bystate
-# J'en suis là
+### Passage de abb à name ('NY' -> 'New York')
+fires_vecdate$state <- state.name[match(fires_vecdate[, state], state.abb)]
+### On fait un aggregate
+fires_vecdate_bystate <- fires_vecdate[, list(fire_count = .N),
+																			 by = list(state = state)]
+fires_vecdate_bystate
+### On merge 'states' et 'fires_vecdate_bystate'
+states@data <- data.table::merge.data.table(x = states@data,
+																						y = fires_vecdate_bystate,
+																						by.x = "name",
+																						by.y = "state")
 
 # on initialise des paramètres de classes (nombre, couleur)
-bins <- c(0, 10, 20, 50, 100, 200, 500, 1000, Inf)
-pal <- colorBin("YlOrRd", domain = states$density, bins = bins)
+bins <- c(0, 20, 50, 100, 200, 500, 1000, 2000, 5000, Inf)
+pal2 <- colorBin("YlOrRd", domain = states$fire_count, bins = bins)
 
 # on rajoute les labels
 labels <- sprintf(
-	"<strong>%s</strong><br/>%g people / mi<sup>2</sup>",
-	states$name, states$density
+	"<strong>%s</strong><br/>%g fires",
+	states$name, states$fire_count
 ) %>% lapply(htmltools::HTML)
-
-
 
 
 # on créé la carte
@@ -132,7 +137,7 @@ m2 <- leaflet(states) %>%
 									 	accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')
 									 )) %>%
 	addPolygons(
-		fillColor = ~ pal(density),
+		fillColor = ~ pal2(fire_count),
 		weight = 2,
 		opacity = 1,
 		color = "white",
@@ -158,8 +163,8 @@ m2 <- leaflet(states) %>%
 		lng2 = max(fires_vecdate[, longitude]),
 		lat2 = max(fires_vecdate[, latitude])
 	) %>% addLegend(
-		pal = pal,
-		values = ~ density,
+		pal = pal2,
+		values = ~ fire_count,
 		opacity = 0.7,
 		title = NULL,
 		position = "bottomright"
