@@ -20,6 +20,8 @@ fires_all <- fread(
 )
 
 # Nettoyage du jeu de données
+### A faire : modifier la date en format date
+new_date <- as.Date(all[, 20], origin = paste(all[, 18] - 1, "-12-31", sep = ""))
 ## Sélection des 6 colonnes utiles (cause, lieu,)
 fires <- fires_all[, c(25, 20, 21, 29, 31, 32)] # adapter
 
@@ -27,8 +29,6 @@ fires <- fires_all[, c(25, 20, 21, 29, 31, 32)] # adapter
 ### Modification de l'année en format factor
 # ne marche pas			
 # fires <- fires[ ,lapply(.SD, as.factor), by=fire_year]
-
-### A faire : modifier la date en format date
 
 ## Vérification du jeu de données
 summary(fires)
