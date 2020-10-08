@@ -5,6 +5,8 @@ rm(list = ls())
 library(data.table)	# adapté aux données massives
 library(ggplot2) # graphiques
 library(randomForest) # prediction
+library(caret)
+
 
 # Set Working Directory ----
 setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier  GitHub Lea
@@ -42,7 +44,8 @@ ggplot(data = fires_bycause,
 # Etape 1 - Peut on faire une prediction correcte ?
 #######################
 # Pour verifier ca, on va selectionner les lignes ou la cause est connue
-fires_knowncause <- fires[stat_cause_descr != "Missing/Undefined",]
+fires_knowncause <- fires[stat_cause_descr != "Missing/Undefined", ]
+fires_knowncause$stat_cause_descr <- factor(fires_knowncause$stat_cause_descr)
 
 # On fait un JDD train et un JDD test
 set.seed(123)
@@ -53,20 +56,48 @@ test_index <- !train_index
 
 ## Creation des tableaux
 ### Tables train
-x_train <- as.data.table(fires_knowncause[train_index, c(2:4, 6)])
-y_train <- fires_knowncause[train_index, 1]
+x_train <- as.data.frame(fires_knowncause[train_index, c(2:4, 6)])
+y_train <- fires_knowncause$stat_cause_descr[train_index]
 
 ### Tables test
-x_test <- as.data.table(fires_knowncause[test_index, c(2:4, 6)])
-y_test <- fires_knowncause[test_index, 1]
+x_test <- as.data.frame(fires_knowncause[test_index, c(2:4, 6)])
+y_test <- fires_knowncause$stat_cause_descr[test_index]
+
+
+
 
 # Random Forest
-mod_rf <- randomForest(x = x_train,
-											 y = y_train,
-											 xtest = x_test,
-											 ytest = y_test,
-											 ntree = 10)
 
+		# # Tests avec package randomForest
+		# mod_rf <- randomForest(x = x_train,
+		# 											 y = y_train,
+		# 											 xtest = x_test,
+		# 											 ytest = y_test,
+		# 											 ntree = 10,
+		# 											 mtry = 2)
+		# 
+		# train <- as.data.table(fires_knowncause[train_index, c(1:4, 6)])
+		# test <- as.data.table(fires_knowncause[test_index, c(1:4, 6)])
+		# 
+		# mod_rf <- randomForest(stat_cause_descr ~ .,
+		# 											 data = train,
+		# 											 ntree = 10)
+
+# copier coller jsp ce que c'est
+tr_control <- trainControl(
+	method = 'cv',
+	number = 2,
+	verboseIter = FALSE,
+	allowParallel = TRUE)
+
+# avec caret::train
+rfmodel <- caret::train(
+	x = x_train,
+	y = y_train,
+	method = 'rf',
+	tuneLength = 3,
+	ntree = 30
+)
 
 #######################
 # Etape 2 - Prediction des causes pour les lignes Missing/Undefined
