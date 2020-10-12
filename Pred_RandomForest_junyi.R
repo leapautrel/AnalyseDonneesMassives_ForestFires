@@ -89,10 +89,13 @@ levels(fires_knowncause$stat_cause_descr)
 # fires_knowncause <- fires[stat_cause_descr != "Missing/Undefined",]
 # fires_knowncause$stat_cause_descr <- factor(fires_knowncause$stat_cause_descr)
 
-fires_2005 <- fires[ fire_year %in% c(1995,2000,2005,2010,2015),]
+
+# dt[letters == "M" & group %in% c("f", "g"), ]
+
+fires_2005 <- fires[ stat_cause_descr != "Missing/Undefined" & fire_year %in% c(1995,2000,2005,2010,2015),]
 dim(fires_2005)
 fires_2005[410850:410872,]
-# fires_2005$fire_year <- as.numeric(fires_2005$fire_year)
+# fires_2005$fire_year <- as.numeric(fires_2005$fire_year) # elle est utile cette ligne??
 fires_2005
 
 set.seed(123)
