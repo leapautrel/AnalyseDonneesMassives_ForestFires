@@ -5,6 +5,7 @@ rm(list = ls())
 library(data.table)	# adapté aux données massives
 library(ggplot2) # graphiques
 library(randomForest) # prediction
+library(caret)
 library(rpart) #prédiction CART
 
 
@@ -94,9 +95,9 @@ levels(fires_knowncause$stat_cause_descr)
 
 fires_2005 <- fires[ stat_cause_descr != "Missing/Undefined" & fire_year %in% c(1995,2000,2005,2010,2015),]
 dim(fires_2005)
-fires_2005[410850:410872,]
+fires_2005[4108:4139,]
 # fires_2005$fire_year <- as.numeric(fires_2005$fire_year) # elle est utile cette ligne??
-fires_2005
+
 
 set.seed(123)
 
@@ -106,7 +107,7 @@ train_index_2005 <- sample(c(TRUE, FALSE),
                            nrow(fires_2005),
                            replace = TRUE,
                            prob = c(0.8, 0.2))
-test_index_2005 <- !train_index
+test_index_2005 <- !train_index_2005
 
 
 # train <- as.data.table(fires_knowncause[train_index, c(1:4, 6)])
@@ -115,22 +116,31 @@ train_2005 <- as.data.table(fires_2005[train_index_2005, c(1:4, 6)])
 test_2005 <- as.data.table(fires_2005[test_index_2005, c(1:4, 6)])
 
 
-
+# l'instant de verite!!
 
 mod.CART <- rpart(stat_cause_descr ~ ., 
-                  data = train)
+                  data = train_2005)
 pred.CART <- predict(mod.CART,
-                     newdata=test,
+                     newdata=test_2005,
                      type="class")
 
-cM <- caret::confusionMatrix(factor(pred.CART,levels=levels(test$stat_cause_descr)),
-                             reference=test$stat_cause_descr)
+cM <- caret::confusionMatrix(factor(pred.CART,levels=levels(test_2005$stat_cause_descr)),
+                             reference=test_2005$stat_cause_descr)
 cM$overall["Accuracy"]
 plot(mod.CART,uniform=TRUE)
 text(mod.CART, cex = 0.75,use.n=FALSE)
 
 # random forest avec que 5 dernières années 2010-2015 ----
 # random forest avec que 5 années de 5 ans en 5 depuis 1995 ----
+
+mod.RF <- randomForest(stat_cause_descr ~ ., 
+                       data = train_2005)
+pred.RF <- predict(mod.RF,
+                   newdata= test_2005,
+                   type="response")
+
+cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+cM$overall["Accuracy"]
 
 #######################
 # Etape 2 - Prediction des causes pour les lignes Missing/Undefined
