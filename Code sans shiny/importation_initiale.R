@@ -9,7 +9,8 @@ require (lubridate)
 setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier  GitHub Lea
 # setwd("C:/Users/mimi/Desktop/M2/Analyse de données massives/projet") # Direction fichier Junyi
 
-# <!> A FAIRE TOURNER 1 FOIS SEULEMENT <!> Nettoyage jeu de données complet puis export du jeu de données propre ----
+# <!> A FAIRE TOURNER 1 FOIS SEULEMENT <!> 
+# Nettoyage jeu de données complet puis export du jeu de données propre
 # Importation jeu de données complet
 fires_all <- fread(
 	"fires_all.csv",
@@ -26,7 +27,7 @@ fires_all$fire_date <-
 	as.Date(fires_all[, discovery_doy], 
 					origin = paste(fires_all[, fire_year] - 1, "-12-31", sep = ""))
 
-fires_all$fire_month <- month(fires_all[, fire_date], TRUE)
+# fires_all$fire_month <- month(fires_all[, fire_date], TRUE) # (inutile en fait)
 print(object.size(fires_all), units = 'Gb')
 names(fires_all)
 
