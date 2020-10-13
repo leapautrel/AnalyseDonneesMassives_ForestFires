@@ -1,7 +1,7 @@
 ## 1. header -------------------------------
 header <- dashboardHeader(
   title = "US wildfires from 1992 to 2015",
-  titleWidth  = 1200,
+  titleWidth  = 350,
   dropdownMenu(
     type = 'messages',
     messageItem(
@@ -20,7 +20,7 @@ sidebar <- dashboardSidebar(
       style = "position: relative; overflow: visible;",
       
       ## 2.1 - Accueil -----------
-      menuItem( "Accueil", tabName = 'accueil', icon = icon('fire')),
+      menuItem( "Présentation", tabName = 'accueil', icon = icon('fire')),
       
       ## 2.3 - Cartographie ----------------------
       menuItem( "Cartographie", tabName = 'carto', icon = icon('globe-americas')),
@@ -35,17 +35,15 @@ body <- dashboardBody(
   tabItems(
     ## 3.1 Accueil -------------------------------------------------------------
     tabItem(tabName = "accueil",
-            h1("Accueil"),
+            h1("Présentation"),
             fluidRow(
-              box(
-                title = h2("Présentation"),
-                status = "warning",
-                width = 12,
-                solidHeader = F,
-                p("Du texte",
-                br(),
-                "Plus de texte")
-              )
+            	box(
+            		title = h2("1.88 Million US Wildfires"),
+            		status = "warning",
+            		width = 12,
+            		solidHeader = F,
+            		textOutput("txt_presentation")
+            	)
             ),
             # Ligne d'informations
             fluidRow(
@@ -59,13 +57,24 @@ body <- dashboardBody(
             
             # Graphiques non interactifs
             fluidRow(
-              column(6, align="center", 
+            	p(br(), br(), br()),
+              column(4.5, align="center", 
                      h2("Number of fires by year"),
+              			 p("By cause"),
                      plotOutput('plot_annee')),
-              column(6, align="center", 
-                     h2("Number of fires by month (1992-2015)"),
-                     plotOutput('plot_mois'))
-              )
+            	
+            	p(br(), br(), br()),
+              column(4.5, align="center", 
+                     h2("Number of fires by month"),
+              			 p("By cause - Sum from 1992 to 2015"),
+                     plotOutput('plot_mois')),
+            	
+            	p(br(), br(), br()),
+    					column(4.5, align="center", 
+              			 h2("Average wildfire size by cause"),
+    								 p("Data from 1992 to 2015"),
+              			 plotOutput('plot_taillecause'))
+            )
             ), 
     
     ## 3.2 Cartographie --------------------------------------------------------
@@ -120,17 +129,24 @@ body <- dashboardBody(
   )
 )
 
+
 # 4. Rassemblement:dashboardPage----
 # 4.1 Feuille de style ----
 tags$head(tags$style(
-  HTML(
-    'h1 { font-family: Baskerville, "Baskerville Old Face" ; font-size: 40px; text-align: center; } 
-    h2 { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 30px; text-align: center; } 
-    p { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 20px; } '
-    )
+	HTML(
+		'h1 { font-family: Baskerville, "Baskerville Old Face" ; font-size: 40px; text-align: center; }
+    h2 { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 30px; text-align: center; }
+    p { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 20px; text-align: justify; } 
+		div.info.legend.leaflet-control br {clear: both; text-align: left; align-self: center;}'
+	)
 ),
 # 4.2 dashboardPage ----
-dashboardPage(header,
-              sidebar,
-              body,
-              skin = "yellow"))
+dashboardPage(
+	# bootstrapPage(
+	# 	tags$style(type = "text/css", "div.info.legend.leaflet-control br {clear: both; text-align: left;}")),
+		header,
+		sidebar,
+		body,
+		skin = "black"
+	)
+)

@@ -1,5 +1,22 @@
 
 shinyServer(function(input, output) {
+	# Textes ----
+	output$txt_presentation <- renderText({
+		HTML(
+			"<p>",
+			"Ces données ont été récoltées pour être utilisées dans le cadre du programme national des Etats-Unis d'analyse des feux (Fire Program Analysis).
+                	Le jeu de données initial contient diverses informations :",
+			"<br>",
+			"<ul>",
+			"<li> Sur l'obtention des données de chaque feu (organisme...) ;",
+			"<li> Sur la localisation du feu ;",
+			"<li> Sur la date de découverte du feu et sur la durée du feu ;",
+			"<li> ...",
+			"<ul>",
+			"Elles proviennent de kaggle. <i> La source </i>",
+			"</p>"
+		)
+	})
   
   # Infos boxes ----
   ## Feux par foudre en moyenne
@@ -47,7 +64,7 @@ shinyServer(function(input, output) {
     # Creation d'une palette de couleurs
     ncauses <- nlevels(i[, stat_cause_descr])
     pal <- leaflet::colorFactor(
-      palette = c("#FF0000FF", "#FF7600FF", "#FFEB00FF", "#0d590f", "#27FF00FF", "#0b210a", "#00FFC4FF", "#872a0b", "#7175f5", "#181ec9", "#9D00FFFF", "#e685d4", "#FF0076FF"),
+      palette = palcol,
       domain = i[, stat_cause_descr]
     )
     
@@ -73,16 +90,16 @@ shinyServer(function(input, output) {
         opacity = 100,
         fill = T,
         color = ~ pal(stat_cause_descr),
-        fillOpacity = 0.3
+        fillOpacity = 0.2
       ) %>%
       
       # ajout de la legende
       addLegend(
-        "bottomright",
+        "bottomleft",
         pal = pal,
         values = ~ stat_cause_descr,
         title = "Cause of the fire",
-        opacity = 0.5
+        opacity = 0.7
       )
     m
     })
@@ -171,7 +188,7 @@ shinyServer(function(input, output) {
         values = ~ fire_count,
         opacity = 0.7,
         title = "Number of fires",
-        position = "bottomright"
+        position = "bottomleft"
       )
 
     m2
@@ -182,4 +199,5 @@ shinyServer(function(input, output) {
   # Graphiques non interactifs ----
   output$plot_annee <- renderPlot({plot_annee})                                  
   output$plot_mois <- renderPlot({plot_mois})
+  output$plot_taillecause <- renderPlot({plot_taillecause})
 })
