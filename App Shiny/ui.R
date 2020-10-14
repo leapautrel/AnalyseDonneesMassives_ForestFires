@@ -1,3 +1,6 @@
+# A finir : arbre de décision graphe
+# + matrice de confusion
+
 ## 1. header -------------------------------
 header <- dashboardHeader(
   title = h1("US wildfires from 1992 to 2015"),
