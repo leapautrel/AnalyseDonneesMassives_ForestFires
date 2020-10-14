@@ -137,6 +137,7 @@ text(mod.CART, cex = 0.75,use.n=FALSE)
 
 # random forest avec que 5 années de 5 ans en 5 depuis 1995 ----
 
+<<<<<<< Updated upstream
 mod.RF_70 <- randomForest(stat_cause_descr ~ ., 
                        ntree = 70,
                        data = train_2005)
@@ -234,6 +235,11 @@ system.time(mod.RF <- randomForest(stat_cause_descr ~ .,
                        nodesize = 100,
                        data = train_2005))
 print(mod.RF)
+=======
+mod.RF <- randomForest(stat_cause_descr ~ ., 
+                       data = train_2005,
+                       importance = TRUE)
+>>>>>>> Stashed changes
 pred.RF <- predict(mod.RF,
                    newdata= test_2005,
                    type="response")
