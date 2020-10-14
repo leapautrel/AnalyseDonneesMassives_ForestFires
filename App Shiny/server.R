@@ -280,10 +280,21 @@ shinyServer(function(input, output) {
 		})
 	})
 	
-	# 3.4 Prevision ----
-	# 3.4.1 Equilibre des donnees
-	output$plot_firespred_bycause <-
+# 3.4 Prevision ----
+# 3.4.1 Equilibre des donnees ----
+output$plot_firespred_bycause <-
+	renderPlot({
+		plot_firespred_bycause
+	})
+	
+	# 3.4.2 Plots accuracy et tps ----
+	output$res_opt_rf_tps <-
 		renderPlot({
-			plot_firespred_bycause
+			res_opt_rf_tps
+		})
+	
+	output$res_opt_rf_acc <-
+		renderPlot({
+			res_opt_rf_acc
 		})
 })

@@ -1,0 +1,26 @@
+---
+title: ''
+output: html_document
+---
+
+```{r eval=FALSE, include=TRUE}
+rf_ntrees <- function(ntree) {
+	# Creation du modele
+	mod_rf <- randomForest(stat_cause_descr ~ ., ntree = ntree, data = data_train)
+	# Predictions
+	p_rf <- predict(mod_rf, newdata = data_test, type = "response")
+	# Matrice de confusion
+	cM <- caret::confusionMatrix(factor(p_rf, levels = levels(data_test$stat_cause_descr)), reference = data_test$stat_cause_descr)
+	# Accuracy
+	accuracy <- cM$overall["Accuracy"]
+	# System time
+	syst_time <- system.time(randomForest(stat_cause_descr ~ ., ntree = ntree, data = data_train))[3]
+	# Return
+	list(ntree = ntree, accuracy = accuracy, syst_time = syst_time)
+}
+
+# Appliquer cette fonction pour différentes valeurs de ntree
+vec_ntree <- c(1, 2, 5, 10, 25, 50, 75)
+res <- sapply(vec_ntree, FUN = rf_ntrees)
+```
+

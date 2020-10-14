@@ -1,6 +1,6 @@
 rm(list = ls())
 
-library (data.table)				# Dataframe plus efficace pour donnees imposantes
+library (data.table)
 library(randomForest)
 library(ggplot2)
 
@@ -51,20 +51,30 @@ rf_ntrees <- function(ntree) {
 }
 
 # Application fonction ----
-vec_ntree <- c(1, 2, 5, 10, 25, 50, 75)
+vec_ntree <- c(1, 2, 5, 10, 25, 50, 70)
 res <- sapply(vec_ntree, FUN = rf_ntrees)
-res
+res_opt_rf <- data.frame(t(res))
+res_opt_rf$ntree <- as.numeric(res_opt_rf$ntree)
+res_opt_rf$accuracy <- as.numeric(res_opt_rf$accuracy)
+res_opt_rf$syst_time <- as.numeric(res_opt_rf$syst_time)
+res_opt_rf
 
-# CA C'EST PLUS BON, a réadapter avec la fonction
-data_plot <- data.frame(ntree = ntree,
-												accuracy = accuracy, 
-												syst_time = syst_time)
+# Export pour réutiliser ces données dans l'app Shiny
+write.csv(res_opt_rf,".\\res_opt_rf.csv", row.names = FALSE)
 
-# Graphique
-ggplot() +
-	geom_line(mapping = aes(x = ntree, y = accuracy)) +
-theme_minimal()
-	
-ggplot() +
-	geom_line(mapping = aes(x = ntree, y = syst_time)) +
+# Graphiques Optimisation de l'algorithme randomForest
+ggplot(data = res_opt_rf,
+			 aes(x = ntree, y = accuracy)) +
+	geom_line(colour = "#B83A1B")  +x
+	geom_point(colour = "#B83A1B") +
+	labs(x = "Nombre d'arbres", 
+			 y = "Accuracy") +
+	theme_minimal()
+
+ggplot(data = res_opt_rf,
+			 aes(x = ntree, y = syst_time)) +
+	geom_line(colour = "#B83A1B") +
+	geom_point(colour = "#B83A1B") +
+	labs(x = "Nombre d'arbres", 
+			 y = "Temps de calcul (en secondes)") +
 	theme_minimal()

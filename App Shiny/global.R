@@ -21,10 +21,12 @@ fires <- fread(
 # Importation des polygones des Etats des USA
 states <-
 	geojsonio::geojson_read(
-		"./us-states.json",
+		"./data/us-states.json",
 		what = "sp"
 	)
 
+# Importation des résultats de la prédiction
+res_opt_rf <- read.csv("data/res_opt_rf.csv")
 
 # Transformation des donnees ----
 ## On ajuste les types des colonnes mal importees
@@ -125,3 +127,29 @@ plot_firespred_bycause <- ggplot(data = firespred_bycause,
 	theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 15),
 				axis.text.y = element_text(size = 15),
 				axis.title.y = element_text(size = 15))
+
+# Graphiques Optimisation de l'algorithme randomForest
+res_opt_rf_acc <- ggplot(data = res_opt_rf,
+												 aes(x = ntree, y = accuracy)) +
+	geom_line(colour = "#B83A1B")  + 
+geom_point(colour = "#B83A1B") +
+	labs(x = "Nombre d'arbres",
+			 y = "Accuracy") +
+	theme_minimal() +
+	theme(axis.text.x = element_text(size = 15),
+				axis.text.y = element_text(size = 15),
+				axis.title.y = element_text(size = 17),
+				axis.title.x = element_text(size = 17))
+
+
+res_opt_rf_tps <- ggplot(data = res_opt_rf,
+			 aes(x = ntree, y = syst_time)) +
+	geom_line(colour = "#B83A1B") +
+	geom_point(colour = "#B83A1B") +
+	labs(x = "Nombre d'arbres", 
+			 y = "Temps de calcul (en secondes)") +
+	theme_minimal() +
+	theme(axis.text.x = element_text(size = 15),
+				axis.text.y = element_text(size = 15),
+				axis.title.y = element_text(size = 17),
+				axis.title.x = element_text(size = 17))

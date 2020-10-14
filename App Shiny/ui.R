@@ -36,7 +36,7 @@ sidebar <- dashboardSidebar(
       					menuItem("Random Forest", 
       									 tabName = 'pred2',
       									 icon = icon('play')),
-      					menuItem("Prédiction des causes inconnues", 
+      					menuItem("Conclusion", 
       									 tabName = 'pred3',
       									 icon = icon('play'))
       					)
@@ -162,7 +162,8 @@ body <- dashboardBody(tabItems(
 				# Choix du nb de feux à afficher
 				sliderInput(
 					inputId = "nblargestfires",
-					label = h3("Number of fires to display on the 1st map"),
+					label = HTML("<h3> Number of fires to display on the 1st map </h3>
+											 <p>The first map will display only the n largest fires.</p>"),
 					min = 2,
 					max = 10000,
 					value = 1000,
@@ -297,19 +298,90 @@ body <- dashboardBody(tabItems(
 	),
 	
 	## 3.3.2 Random Forest :Efficacité de la méthode ----
-	tabItem(
-		tabName = "pred2",
-		h2("Prédiction"),
-		fluidRow(),
-		fluidRow()
+	tabItem(tabName = "pred2",
+					h2("Prédiction"),
+					fluidRow(
+						column(
+							width = 12,
+							shinydashboard::box(
+								status = "warning",
+								width = 12,
+								solidHeader = F,
+								HTML(
+									"<h3>Régression logistique multinomiale</h3> <br>
+								<p style='text-align:center'> Données trop nombreuses et volumineuses, impossible techniquement.<p>"
+								)
+							),
+							shinydashboard::box(
+								status = "warning",
+								width = 12,
+								solidHeader = F,
+								HTML(
+									"<h3>Arbres décisionnels</h3> <br>
+								<p style='text-align:center'> Etape 1 : avec un arbre </p>"
+								)
+							),
+							shinydashboard::box(
+								status = "warning",
+								width = 12,
+								solidHeader = F,
+								HTML(
+									"<h3> Arbres décisionnels : Forêt aléatoire </h3> <br>
+									 	<p style='text-align:center'> Méthode rapide, donc possible avec des données importantes. </p>"
+								),
+								HTML("<h1>Fonction R</h1>"),
+								includeMarkdown("code_extract.Rmd"),
+								HTML("<h1>Optimisation de l'algorithme randomForest</h1>"),
+								plotOutput('res_opt_rf_acc'),
+								plotOutput('res_opt_rf_tps')
+							)
+						)
+					)
 	),
 	
 	## 3.3.3 Prédiction ----
 	tabItem(
 		tabName = "pred3",
 		h2("Prédiction"),
-		fluidRow(),
-		fluidRow()
+		fluidRow(
+			column(
+				width = 12,
+				shinydashboard::box(
+					status = "warning",
+					width = 12,
+					solidHeader = F,
+					HTML(
+						"<h3> Conclusion </h3> <br>
+					 <p> 
+					 L'accuracy est environ de 50% avec cette méthode, peu importe le nombre d'arbres choisi.
+					 Prédire les causes inconnues avec cette méthode n'a donc pas de sens, il y aurait trop d'erreurs.
+					 </p>
+						"
+					)
+				)),
+			column(
+				width = 12,
+				align = "center",
+				shinydashboard::box(
+					width = 12,
+					solidHeader = F,
+					HTML(
+						"
+							<h3>Suite possible</h3> <br>
+							<p> Pour prédir la cause du feu avec une meilleure précision, plusieurs pistes sont envisageables :
+								<ul>
+									<li><p> Utiliser plus de variables (<i>mais cela prendrait beaucoup de temps !</i>) </p></li>
+									<li><p> Ajuster les autres hyperparamètres de l'algorithme randomForest, comme par exemple la profondeur maximum de chaque arbre. Ici, seul le paramètre 'Nombre d'arbres' a été optimisé. </p></li>
+									<li><p> Utiliser d'autres méthodes, comme par exemple un réseau de neurones</p></li>
+									<li><p> Fusionner certaines variables réponses pour prédire uniquement des causes intéressantes et sur lesquels on pourrait agir (ex : fusionner 'Lightning' et 'Miscellaneous'), 
+									puis voir si cela améliore la prédiction</p></li>
+								</ul>
+							</p>
+						 "
+					),
+				)
+			)
+		)
 	)
 	
 ))
@@ -324,13 +396,12 @@ tags$head(tags$style(
     h3 { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 30px; text-align: center; }
     h4 { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 23px; text-align: center; letter-spacing: -1.2px; font-weight: 400; text-transform: uppercase; }
     p { font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif; font-size: 20px; text-align: justify; } 
+    p.codeR {font-family: "Courier New", Courier, monospace; font-size: 15px; letter-spacing: -1.2px; word-spacing: -1.2px;}
 		div.info.legend.leaflet-control br {clear: both; text-align: left; align-self: left;}'
 	)
 ),
 # 4.2 dashboardPage ----
 dashboardPage(
-	# bootstrapPage(
-	# 	tags$style(type = "text/css", "div.info.legend.leaflet-control br {clear: both; text-align: left;}")),
 		header,
 		sidebar,
 		body,
