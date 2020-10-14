@@ -213,8 +213,19 @@ for (i in seq(from = 1, to = 70, by = 5)){
 }
 
 ## méthode bourrin----
+time_70 <- system.time(mod.RF_70 <- randomForest(stat_cause_descr ~ .,
+                                      ntree = 70,
+                                      data = train_2005))
 
-system.time(mod.RF_60 <- randomForest(stat_cause_descr ~ .,
+pred.RF_70 <- predict(mod.RF_70,
+                      newdata= test_2005,
+                      type="response")
+
+cM <- caret::confusionMatrix(factor(pred.RF_70,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+tree_70 <- cM$overall["Accuracy"]
+tree_70
+
+time_60 <- system.time(mod.RF_60 <- randomForest(stat_cause_descr ~ .,
                           ntree = 60,
                           data = train_2005))
 
@@ -226,7 +237,7 @@ cM <- caret::confusionMatrix(factor(pred.RF_60,levels=levels(test_2005$stat_caus
 tree_60 <- cM$overall["Accuracy"]
 tree_60
 
-system.time(mod.RF_50 <- randomForest(stat_cause_descr ~ .,
+time_50 <- system.time(mod.RF_50 <- randomForest(stat_cause_descr ~ .,
                                        ntree = 50,
                                        data = train_2005))
 
@@ -238,7 +249,7 @@ cM <- caret::confusionMatrix(factor(pred.RF_50,levels=levels(test_2005$stat_caus
 tree_50 <- cM$overall["Accuracy"]
 tree_50
 
-system.time(mod.RF_40 <- randomForest(stat_cause_descr ~ .,
+time_40 <- system.time(mod.RF_40 <- randomForest(stat_cause_descr ~ .,
                           ntree = 40,
                           data = train_2005))
 
@@ -250,9 +261,9 @@ cM <- caret::confusionMatrix(factor(pred.RF_40,levels=levels(test_2005$stat_caus
 tree_40 <- cM$overall["Accuracy"]
 tree_40
 
-mod.RF_30 <- randomForest(stat_cause_descr ~ .,
+time_30 <- system.time(mod.RF_30 <- randomForest(stat_cause_descr ~ .,
                           ntree = 30,
-                          data = train_2005)
+                          data = train_2005))
 
 pred.RF_30 <- predict(mod.RF_30,
                    newdata= test_2005,
@@ -262,9 +273,9 @@ cM <- caret::confusionMatrix(factor(pred.RF_30,levels=levels(test_2005$stat_caus
 tree_30 <- cM$overall["Accuracy"]
 tree_30
 
-mod.RF_20 <- randomForest(stat_cause_descr ~ .,
+time_20 <- system.time (mod.RF_20 <- randomForest(stat_cause_descr ~ .,
                           ntree = 20,
-                          data = train_2005)
+                          data = train_2005))
 
 pred.RF_20 <- predict(mod.RF_20,
                    newdata= test_2005,
@@ -274,9 +285,9 @@ cM <- caret::confusionMatrix(factor(pred.RF_20,levels=levels(test_2005$stat_caus
 tree_20 <- cM$overall["Accuracy"]
 tree_20
 
-mod.RF_10 <- randomForest(stat_cause_descr ~ .,
+time_10 <- system.time(mod.RF_10 <- randomForest(stat_cause_descr ~ .,
                           ntree = 10,
-                          data = train_2005)
+                          data = train_2005))
 
 pred.RF_10 <- predict(mod.RF_10,
                    newdata= test_2005,
@@ -285,10 +296,12 @@ pred.RF_10 <- predict(mod.RF_10,
 cM <- caret::confusionMatrix(factor(pred.RF_10,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
 tree_10 <- cM$overall["Accuracy"]
 
-nbarbres <- c(10,20,30,40,50,60)
-accuracy <- c(tree_10, tree_20, tree_30, tree_40, tree_50, tree_60)
+nbarbres <- c(10,20,30,40,50,60,70)
+accuracy <- c(tree_10, tree_20, tree_30, tree_40, tree_50, tree_60, tree_70)
+time <- c(time_10[3], time_20[3], time_30[3], time_40[3], time_50[3], time_60[3], time_70[3])
 
 plot(nbarbres, accuracy, type = "l")
+plot(nbarbres, time, "l")
 
 # essai avec lapply 
 
