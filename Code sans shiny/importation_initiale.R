@@ -32,7 +32,7 @@ print(object.size(fires_all), units = 'Gb')
 names(fires_all)
 
 ## Sélection des colonnes utiles (cause, lieu,)
-fires <- fires_all[, c(25, 29, 31, 32, 35, 20, 41, 40)] 
+fires <- fires_all[, c(25, 29, 31, 32, 35, 20, 40)] 
 
 
 ## Vérification du jeu de données

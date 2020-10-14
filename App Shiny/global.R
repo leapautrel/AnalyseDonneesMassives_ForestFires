@@ -5,6 +5,8 @@ library(ggplot2)						# Pour les graphiques
 library (data.table)				# Dataframe plus efficace pour donnees imposantes
 library (leaflet)						# Cartographie
 library(geojsonio)					# Cartographie (etats USA)
+library(dplyr)							# fonction desc
+library(DT)
 
 # Importation des donnees ---- 
 fires <- fread(
@@ -63,7 +65,7 @@ plot_annee <- ggplot(as.data.frame(fires), aes(x = fire_year)) +
 				legend.text = element_text(size = 15)) # Penche les annees)
 
 # G2. Graphique par mois ----
-plot_mois <- ggplot(as.data.frame(fires), aes(x = reorder(month, desc(month)))) +
+plot_mois <- ggplot(as.data.frame(fires), aes(x = reorder(month, dplyr::desc(month)))) +
 	geom_histogram(stat = "count", # Nombre de feux
 								 aes(fill = stat_cause_descr), # Couleur selon cause
 								 position = "stack") + # Histogramme empile
