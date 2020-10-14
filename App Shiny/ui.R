@@ -29,7 +29,17 @@ sidebar <- dashboardSidebar(
       menuItem( "Cartographie", tabName = 'carto', icon = icon('globe-americas')),
       
       ## 2.4 - Prediction ----------------------
-      menuItem( "Prédiction", tabName = 'pred', icon = icon('search'))
+      menuItem( "Prédiction", tabName = 'pred', icon = icon('search'),
+      					menuItem("Problématique et démarche", 
+      									 tabName = 'pred1',
+      									 icon = icon('play')),
+      					menuItem("Random Forest", 
+      									 tabName = 'pred2',
+      									 icon = icon('play')),
+      					menuItem("Prédiction des causes inconnues", 
+      									 tabName = 'pred3',
+      									 icon = icon('play'))
+      					)
       )
   )
 
@@ -201,9 +211,11 @@ body <- dashboardBody(tabItems(
 		)
 	),
 	
-	## 3.3 Prediction ----------------------------------------------------------
+	
+	## 3.3 Prédiction ----
+	## 3.3.1 Problématique et démarche ----
 	tabItem(
-		tabName = "pred",
+		tabName = "pred1",
 		h2("Prédiction"),
 		fluidRow(
 			shinydashboard::box(
@@ -229,29 +241,29 @@ body <- dashboardBody(tabItems(
 			),
 			infoBox(
 				"Feux dont la cause est inconnue",
-				nrow(fires[stat_cause_descr == "Missing/Undefined", ]),
+				nrow(fires[stat_cause_descr == "Missing/Undefined",]),
 				icon = icon("poo-storm"),
 				color = "yellow",
 				width = 4
 			)
 		),
 		fluidRow(
-			shinydashboard::box(
+			column(
+				width = 6,
+				shinydashboard::box(
 				status = "warning",
 				width = 12,
 				solidHeader = F,
 				HTML(
 					"<h3> Démarche </h3> <br>
-					<ul>
-						<li> <p> Sur un jeu de données avec uniquement des causes connues, vérifier s'il est possible de prédire la cause des feux en fonction de :</p>
-							<ul>
-								<li><p>La taille du feu (en acres)</p></li>
-								<li><p>La localisation du feu (longitude + latitude)</p></li>
-								<li><p>L'année du feu</p></li>
-							</ul>
-						</li>
-						<li> <p> Sur le jeu de données complet, si une prédiction est possible, prédire la cause des feux où elle n'est pas connue avec la méthode validée à l'étape précédente. </p></li>
-					</ul>"
+					 <p> D'abord, sur un jeu de données avec <u>uniquement des causes connues</u>, vérifier s'il est possible de prédire la cause des feux en fonction de :</p>
+						<ul>
+							<li><p>La taille du feu (en acres)</p></li>
+							<li><p>La localisation du feu (longitude + latitude)</p></li>
+							<li><p>L'année du feu</p></li>
+						</ul>
+					<p> Sur le <u>jeu de données complet</u>, si une prédiction est possible, prédire la cause des feux où elle n'est pas connue avec la méthode validée à l'étape précédente. </p></li>
+					"
 				),
 				HTML(
 					"<h3> Sélection des données </h3>",
@@ -262,17 +274,44 @@ body <- dashboardBody(tabItems(
 						<li> <p> Tout en préservant des informations liées à la variabilité dans le temps </p></li>
 					</ul>"
 				)
-			),
+			)),
 			column(
-				6,
+				width = 6,
 				align = "center",
-				h3("Causes of the fires"),
-				p("By cause",
-					style = "text-align: center; "),
-				plotOutput('plot_firespred_bycause')
+				shinydashboard::box(
+					width = 12,
+					solidHeader = F,
+					HTML(
+						"
+				<h1> Causes des feux (années 1995, 2000, 2005, 2010, 2015) </h1>
+				<br>
+				<p> Ce graphique permet de voir que les données ne sont <b>pas équilibrées</b> :
+				il y a, par exemple, beaucoup plus de feux dus à la combustion de débris qu'à des feux d'artifices.
+				Cela devrait être gardé en tête pour le choix des algorithmes de prédictions. </p>
+						 "
+					),
+					plotOutput('plot_firespred_bycause')
+				)
 			)
 		)
+	),
+	
+	## 3.3.2 Random Forest :Efficacité de la méthode ----
+	tabItem(
+		tabName = "pred2",
+		h2("Prédiction"),
+		fluidRow(),
+		fluidRow()
+	),
+	
+	## 3.3.3 Prédiction ----
+	tabItem(
+		tabName = "pred3",
+		h2("Prédiction"),
+		fluidRow(),
+		fluidRow()
 	)
+	
 ))
 
 

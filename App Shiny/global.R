@@ -120,7 +120,8 @@ plot_firespred_bycause <- ggplot(data = firespred_bycause,
 																 )) +
 	geom_bar(stat = 'identity', fill = 'red') +
 	labs(x = '', 
-			 y = 'Nombre de feux (en milliers)', 
-			 title = 'Causes des feux (années 1995, 2000, 2005, 2010, 2015)') +
+			 y = 'Nombre de feux (en milliers)') +
 	theme_minimal() +
-	theme(axis.text.x = element_text(angle = 45, hjust = 1))
+	theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 15),
+				axis.text.y = element_text(size = 15),
+				axis.title.y = element_text(size = 15))
