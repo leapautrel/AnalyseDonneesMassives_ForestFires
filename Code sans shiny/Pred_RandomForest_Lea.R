@@ -11,19 +11,19 @@ library(rpart) #prédiction CART
 
 
 # Set Working Directory ----
-setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier  GitHub Lea
-# setwd("C:/Users/mimi/Desktop/M2/Analyse de données massives/projet") # Direction fichier Junyi
+#setwd("D:/Google Drive/Agrocampus/M2/UE4-AnalyseDonneesMassiveR/Projet_Foret") # Direction fichier  GitHub Lea
+setwd("C:/Users/mimi/Desktop/M2/Analyse de données massives/projet") # Direction fichier Junyi
 
 # Importation jeu de données propre (cf document 'importation_initiale') ----
-fires <- fread(
-  "fires.csv",
-  header = TRUE,
-  sep = ",",
-  na.strings = "",
-  blank.lines.skip = TRUE,
-  stringsAsFactors = TRUE
-)
-
+# fires <- fread(
+#   "fires.csv",
+#   header = TRUE,
+#   sep = ",",
+#   na.strings = "",
+#   blank.lines.skip = TRUE,
+#   stringsAsFactors = TRUE
+# )
+# 
 fires$fire_year <- as.factor(fires$fire_year) # annee 
 summary(fires)
 
@@ -112,10 +112,6 @@ train_index_2005 <- sample(c(TRUE, FALSE),
                            replace = TRUE,
                            prob = c(0.8, 0.2))
 test_index_2005 <- !train_index_2005
-
-
-# train <- as.data.table(fires_knowncause[train_index, c(1:4, 6)])
-# test <- as.data.table(fires_knowncause[test_index, c(1:4, 6)])
 train_2005 <- as.data.table(fires_2005[train_index_2005, c(1:4, 6)])
 test_2005 <- as.data.table(fires_2005[test_index_2005, c(1:4, 6)])
 print(object.size(train_2005), units = 'Mb')
@@ -137,93 +133,101 @@ text(mod.CART, cex = 0.75,use.n=FALSE)
 
 # random forest avec que 5 années de 5 ans en 5 depuis 1995 ----
 
-<<<<<<< Updated upstream
-mod.RF_70 <- randomForest(stat_cause_descr ~ ., 
-                       ntree = 70,
+x <- c()
+y <- c()
+for (i in (1:10)){
+
+  mod.RF <- randomForest(stat_cause_descr ~ ., 
+                       ntree = i,
                        data = train_2005)
 
-pred.RF <- predict(mod.RF,
+  pred.RF <- predict(mod.RF,
                    newdata= test_2005,
-                   type="response")
+                   type = "response")
 
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_70 <- cM$overall["Accuracy"]
+  cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+  tree_i <- cM$overall["Accuracy"]
+  x <- x + i
+  y <- y + tree_i
+}
 
-mod.RF_60 <- randomForest(stat_cause_descr ~ ., 
-                          ntree = 60,
-                          data = train_2005)
 
-pred.RF <- predict(mod.RF,
-                   newdata= test_2005,
-                   type="response")
-
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_60 <- cM$overall["Accuracy"]
-tree_60
-
-stystem.time(mod.RF_50 <- randomForest(stat_cause_descr ~ ., 
-                          ntree = 50,
-                          data = train_2005))
-
-pred.RF <- predict(mod.RF,
-                   newdata= test_2005,
-                   type="response")
-
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_50 <- cM$overall["Accuracy"]
-tree_50
-
-mod.RF_40 <- randomForest(stat_cause_descr ~ ., 
-                          ntree = 40,
-                          data = train_2005)
-
-pred.RF <- predict(mod.RF,
-                   newdata= test_2005,
-                   type="response")
-
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_40 <- cM$overall["Accuracy"]
-tree_40
-
-mod.RF_30 <- randomForest(stat_cause_descr ~ ., 
-                          ntree = 30,
-                          data = train_2005)
-
-pred.RF <- predict(mod.RF,
-                   newdata= test_2005,
-                   type="response")
-
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_30 <- cM$overall["Accuracy"]
-tree_30
-
-mod.RF_20 <- randomForest(stat_cause_descr ~ ., 
-                          ntree = 20,
-                          data = train_2005)
-
-pred.RF <- predict(mod.RF,
-                   newdata= test_2005,
-                   type="response")
-
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_20 <- cM$overall["Accuracy"]
-tree_20
-
-mod.RF_10 <- randomForest(stat_cause_descr ~ ., 
-                          ntree = 10,
-                          data = train_2005)
-
-pred.RF <- predict(mod.RF,
-                   newdata= test_2005,
-                   type="response")
-
-cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
-tree_10 <- cM$overall["Accuracy"]
-tree_10
-
-x = c(10,20,30,40,50,60,70)
-y = (0.53,0.53204, 0.53208, 0.53182, 0.53228, 0.53190, 0.5327 )
+# boucle avec les trucs 
 plot(x,y)
+
+# mod.RF_60 <- randomForest(stat_cause_descr ~ ., 
+#                           ntree = 60,
+#                           data = train_2005)
+# 
+# pred.RF <- predict(mod.RF,
+#                    newdata= test_2005,
+#                    type="response")
+# 
+# cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+# tree_60 <- cM$overall["Accuracy"]
+# tree_60
+# 
+# stystem.time(mod.RF_50 <- randomForest(stat_cause_descr ~ ., 
+#                           ntree = 50,
+#                           data = train_2005))
+# 
+# pred.RF <- predict(mod.RF,
+#                    newdata= test_2005,
+#                    type="response")
+# 
+# cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+# tree_50 <- cM$overall["Accuracy"]
+# tree_50
+# 
+# mod.RF_40 <- randomForest(stat_cause_descr ~ ., 
+#                           ntree = 40,
+#                           data = train_2005)
+# 
+# pred.RF <- predict(mod.RF,
+#                    newdata= test_2005,
+#                    type="response")
+# 
+# cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+# tree_40 <- cM$overall["Accuracy"]
+# tree_40
+# 
+# mod.RF_30 <- randomForest(stat_cause_descr ~ ., 
+#                           ntree = 30,
+#                           data = train_2005)
+# 
+# pred.RF <- predict(mod.RF,
+#                    newdata= test_2005,
+#                    type="response")
+# 
+# cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+# tree_30 <- cM$overall["Accuracy"]
+# tree_30
+# 
+# mod.RF_20 <- randomForest(stat_cause_descr ~ ., 
+#                           ntree = 20,
+#                           data = train_2005)
+# 
+# pred.RF <- predict(mod.RF,
+#                    newdata= test_2005,
+#                    type="response")
+# 
+# cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+# tree_20 <- cM$overall["Accuracy"]
+# tree_20
+# 
+# mod.RF_10 <- randomForest(stat_cause_descr ~ ., 
+#                           ntree = 10,
+#                           data = train_2005)
+# 
+# pred.RF <- predict(mod.RF,
+#                    newdata= test_2005,
+#                    type="response")
+# 
+# cM <- caret::confusionMatrix(factor(pred.RF,levels=levels(test_2005$stat_cause_descr)),reference=test_2005$stat_cause_descr)
+# tree_10 <- cM$overall["Accuracy"]
+# tree_10
+
+
 
 # j'ai utilisé une méthode bourrin parce que j'ai pas réussi lapply 
 # mais meme comme ca ca marche pas :'(
@@ -235,11 +239,11 @@ system.time(mod.RF <- randomForest(stat_cause_descr ~ .,
                        nodesize = 100,
                        data = train_2005))
 print(mod.RF)
-=======
+
 mod.RF <- randomForest(stat_cause_descr ~ ., 
                        data = train_2005,
                        importance = TRUE)
->>>>>>> Stashed changes
+
 pred.RF <- predict(mod.RF,
                    newdata= test_2005,
                    type="response")
