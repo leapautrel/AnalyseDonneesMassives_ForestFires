@@ -105,3 +105,22 @@ plot_taillecause <- ggplot(as.data.frame(taillecause),
 	theme_minimal() +
 	theme(axis.text.x = element_text(size = 15),
 				axis.text.y = element_text(size = 15))
+
+# 3.4 Prevision ----
+# 3.4.1 Graphique ----
+## aggregation pour les annees 1995, 2000, 2005, 2010, 2015
+firespred_bycause <- fires[fire_year %in% c(1995, 2000, 2005, 2010, 2015), 
+													 list(fire_count = .N), 
+													 by = stat_cause_descr]
+## plot
+plot_firespred_bycause <- ggplot(data = firespred_bycause,
+																 aes(
+																 	x = reorder(stat_cause_descr,-fire_count),
+																 	y = fire_count / 1000
+																 )) +
+	geom_bar(stat = 'identity', fill = 'red') +
+	labs(x = '', 
+			 y = 'Nombre de feux (en milliers)', 
+			 title = 'Causes des feux (années 1995, 2000, 2005, 2010, 2015)') +
+	theme_minimal() +
+	theme(axis.text.x = element_text(angle = 45, hjust = 1))

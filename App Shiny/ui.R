@@ -87,8 +87,8 @@ body <- dashboardBody(tabItems(
 			infoBoxOutput("fireslighning", width = 6)
 		),
 		fluidRow(
-			infoBoxOutput("statemostfires", width = 6),
-			infoBoxOutput("causefreq", width = 6)
+			infoBoxOutput("causefreq", width = 6),
+			infoBoxOutput("statemostfires", width = 6)
 		)
 	),
 	
@@ -140,7 +140,7 @@ body <- dashboardBody(tabItems(
 				# Selection de l'intervalle de temps
 				dateRangeInput(
 					inputId = "idDateRange",
-					label = "Choose a time frame",
+					label = h3("Choose a time frame"),
 					start = "1992-01-01",
 					end = "2015-12-31",
 					format = "yyyy-mm-dd",
@@ -176,7 +176,8 @@ body <- dashboardBody(tabItems(
 			infoBoxOutput("infotimeframe1", width = 4),
 			infoBoxOutput("infotimeframe2", width = 4),
 			infoBoxOutput("infotimeframe3", width = 4),
-			br(), br()
+			br(),
+			br()
 		),
 		
 		# 3.3.3 Affichage des cartes ----
@@ -187,24 +188,92 @@ body <- dashboardBody(tabItems(
 				align = "center",
 				h3("Location and cause of the largest fires in this time frame"),
 				tabPanel("carte 1.", leafletOutput("carte1")),
-				br(), br()
+				br(),
+				br()
 			),
 			# Carte 2
-			fluidRow(
-				column(
-					12,
-					align = "center",
-					h3("Number of fires in each state in this time frame"),
-					tabPanel("carte 2.", leafletOutput("carte2"))
-				)
+			fluidRow(column(
+				12,
+				align = "center",
+				h3("Number of fires in each state in this time frame"),
+				tabPanel("carte 2.", leafletOutput("carte2"))
 			))
+		)
+	),
+	
+	## 3.3 Prediction ----------------------------------------------------------
+	tabItem(
+		tabName = "pred",
+		h2("Prédiction"),
+		fluidRow(
+			shinydashboard::box(
+				title = h3("Problématique"),
+				status = "warning",
+				width = 8,
+				solidHeader = F,
+				HTML(
+					"<p>
+					La cause d'un certain nombre de feux reste inconnue dans la base de données.
+					Or connaître les causes des feux a de nombreuses utilités, notamment pour prévenir la formation de feux.
+					<i> Par exemple, cela pourrait permettre de faire des campagnes de communication dans les zones où il y a beaucoup de feux dûs à la combustion de débris. </i>
+					</p>"
+				)
+			),
+			br(),
+			infoBox(
+				"Feux totaux",
+				nrow(fires),
+				icon = icon("fire"),
+				color = "yellow",
+				width = 4
+			),
+			infoBox(
+				"Feux dont la cause est inconnue",
+				nrow(fires[stat_cause_descr == "Missing/Undefined", ]),
+				icon = icon("poo-storm"),
+				color = "yellow",
+				width = 4
+			)
 		),
-		
-		## 3.3 Prediction ----------------------------------------------------------
-		tabItem(tabName = "pred",
-						h2("Prédiction"))
+		fluidRow(
+			shinydashboard::box(
+				status = "warning",
+				width = 12,
+				solidHeader = F,
+				HTML(
+					"<h3> Démarche </h3> <br>
+					<ul>
+						<li> <p> Sur un jeu de données avec uniquement des causes connues, vérifier s'il est possible de prédire la cause des feux en fonction de :</p>
+							<ul>
+								<li><p>La taille du feu (en acres)</p></li>
+								<li><p>La localisation du feu (longitude + latitude)</p></li>
+								<li><p>L'année du feu</p></li>
+							</ul>
+						</li>
+						<li> <p> Sur le jeu de données complet, si une prédiction est possible, prédire la cause des feux où elle n'est pas connue avec la méthode validée à l'étape précédente. </p></li>
+					</ul>"
+				),
+				HTML(
+					"<h3> Sélection des données </h3>",
+					"<p> Dans le cadre d'une prédiction, seuls les feux des années 1995, 2000, 2005, 2010, 2015 seront étudiés.
+					Ce choix a été fait afin de : </p>
+					<ul>
+						<li> <p> Diminuer la quantité de données pour diminuer les temps de calcul des algorithmes</p></li>
+						<li> <p> Tout en préservant des informations liées à la variabilité dans le temps </p></li>
+					</ul>"
+				)
+			),
+			column(
+				6,
+				align = "center",
+				h3("Causes of the fires"),
+				p("By cause",
+					style = "text-align: center; "),
+				plotOutput('plot_firespred_bycause')
+			)
+		)
 	)
-)
+))
 
 
 # 4. Rassemblement : dashboardPage----
