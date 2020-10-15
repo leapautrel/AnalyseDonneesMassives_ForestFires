@@ -297,4 +297,27 @@ output$plot_firespred_bycause <-
 		renderPlot({
 			res_opt_rf_acc
 		})
+	
+	# 3.4.3 Image one tree
+	output$onetreeplot <- renderImage({
+		expr <-
+			list(
+				src = "./data/onetree.png",
+				height = 700,
+				alt = "One tree graphe",
+				class = "marginauto"
+			)
+	}, deleteFile = FALSE)
+	
+	# 3.4.2 confusion matrix
+	output$confusionmatrix_25tree <- renderImage({
+		expr <-
+			list(
+				src = "./data/confusionmatrix_25tree.png",
+				height = 500,
+				alt = "Confusion matrix of frequencies",
+				class = "marginauto"
+			)
+	}, deleteFile = FALSE)
+	
 })

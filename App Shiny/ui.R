@@ -322,7 +322,14 @@ body <- dashboardBody(tabItems(
 								HTML(
 									"<h3>Arbres décisionnels</h3> <br>
 								<p style='text-align:center'> Etape 1 : avec un arbre </p>"
-								)
+								),
+								column(12,
+											 align = "center",
+											 plotOutput("onetreeplot", height = "700px")),
+								# HTML('
+								# <p class="aligncenter">
+								# 	<img src="onetree.png" alt="One tree graphe">
+								# </p>')
 							),
 							shinydashboard::box(
 								status = "warning",
@@ -332,11 +339,24 @@ body <- dashboardBody(tabItems(
 									"<h3> Arbres décisionnels : Forêt aléatoire </h3> <br>
 									 	<p style='text-align:center'> Méthode rapide, donc possible avec des données importantes. </p>"
 								),
-								HTML("<h1>Fonction R</h1>"),
+								HTML("<h4>Fonction R</h4>"),
 								includeMarkdown("code_extract.Rmd"),
-								HTML("<h1>Optimisation de l'algorithme randomForest</h1>"),
-								plotOutput('res_opt_rf_acc'),
-								plotOutput('res_opt_rf_tps')
+								HTML("<br><br><h4>Optimisation du nombres d'arbres de l'algorithme randomForest</h4>"),
+								column(
+									width = 6,
+									HTML("<h1 style='text-align:center'>Evolution de l'accuracy</h1>"),
+									plotOutput('res_opt_rf_acc')
+								),
+								column(
+									width = 6,
+									HTML("<h1 style='text-align:center'>Evolution du temps de calcul</h1>"),
+									plotOutput('res_opt_rf_tps')
+								),
+								column(12,
+											 align = "center",
+											 HTML(
+											 	"<br><br><h4> Matrice de confusion (fréquences)</h4>"),
+											 plotOutput("confusionmatrix_25tree", height = "500px"))
 							)
 						)
 					)

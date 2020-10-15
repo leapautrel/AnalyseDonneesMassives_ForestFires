@@ -3,6 +3,8 @@ rm(list = ls())
 library (data.table)
 library(randomForest)
 library(ggplot2)
+library(tibble)
+library(tidyverse)
 
 # Importation des donnees ---- 
 fires <- fread(
@@ -78,3 +80,50 @@ ggplot(data = res_opt_rf,
 	labs(x = "Nombre d'arbres", 
 			 y = "Temps de calcul (en secondes)") +
 	theme_minimal()
+
+
+# Matrice de confusion pour 25 arbres
+mod_rf <- randomForest(stat_cause_descr ~ .,
+											 ntree = 25,
+											 data = data_train)
+p_rf <- predict(mod_rf,
+								newdata = data_test,
+								type = "response")
+cM <- caret::confusionMatrix(factor(p_rf,
+																		levels = levels(data_test$stat_cause_descr)),
+														 reference = data_test$stat_cause_descr)
+accuracy <- cM$overall["Accuracy"]
+cM$table
+confusionmatrix <- data.frame(cM$table)
+class(confusionmatrix)
+plot(confusionmatrix)
+# Heatmap
+confmatrix <- yardstick::conf_mat(data_test$stat_cause_descr, p_rf)
+autoplot(confusionmatrix, type = "heatmap") +
+	scale_fill_gradient(low="#D6EAF8",high = "#2E86C1")
+
+ggplot(data = confusionmatrix,
+			 aes(x = Reference, y = Prediction, fill = Freq)) +
+	geom_tile() +
+	geom_text(aes(label = round(Freq, 2)), size = 3, color = 'gray20') + 
+	scale_fill_gradient(low = 'yellow', high = 'red', limits = c(0,1), name = 'Relative Frequency') + 
+	theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+	ggtitle('Confusion Matrix - xgboost')	
+
+caret::confusionMatrix(factor(p_rf,
+											 levels = levels(data_test$stat_cause_descr)),
+								reference = data_test$stat_cause_descr)$table %>%
+	prop.table(margin = 1) %>%
+	as.data.frame.matrix() %>%
+	tibble::rownames_to_column(var = 'actual') %>%
+	gather(key = 'prediction', value = 'freq',-actual) %>%
+	ggplot(aes(x = actual, y = prediction, fill = freq)) +
+	geom_tile() +
+	geom_text(aes(label = round(freq, 2)), size = 3, color = 'gray20') + 
+	scale_fill_gradient(low = 'yellow', high = 'red', limits = c(0,1), name = 'Relative Frequency') + 
+	labs(x = "Observé", 
+			 y = "Prédit") +
+	theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+				axis.text.y = element_text(size = 12),
+				axis.title.y = element_text(size = 17),
+				axis.title.x = element_text(size = 17))
