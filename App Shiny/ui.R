@@ -352,10 +352,14 @@ body <- dashboardBody(tabItems(
 									HTML("<h1 style='text-align:center'>Evolution du temps de calcul</h1>"),
 									plotOutput('res_opt_rf_tps')
 								),
+								HTML("<p style='text-align:center'> Ajustement des autres hyperparamètres de l'algorithme randomForest, 
+										 comme par exemple la profondeur maximum de chaque arbre <br>
+										 → diminution de l'accuracy</p>"),
 								column(12,
 											 align = "center",
 											 HTML(
-											 	"<br><br><h4> Matrice de confusion (fréquences)</h4>"),
+											 	"<br><br><h4> Matrice de confusion (fréquences)</h4> <br>
+											 	<h1> Pour ntree = 25 </h1>"),
 											 plotOutput("confusionmatrix_25tree", height = "500px"))
 							)
 						)
@@ -393,11 +397,11 @@ body <- dashboardBody(tabItems(
 							<h3>Suite possible</h3> <br>
 							<p> Pour prédir la cause du feu avec une meilleure précision, plusieurs pistes sont envisageables :
 								<ul>
-									<li><p> Utiliser plus de variables (<i>mais cela prendrait beaucoup de temps !</i>) </p></li>
-									<li><p> Ajuster les autres hyperparamètres de l'algorithme randomForest, comme par exemple la profondeur maximum de chaque arbre. Ici, seul le paramètre 'Nombre d'arbres' a été optimisé. </p></li>
+									<li><p> Utiliser plus de variables (<i>mais cela prendrait beaucoup de temps</i>) </p></li>
 									<li><p> Utiliser d'autres méthodes, comme par exemple un réseau de neurones</p></li>
 									<li><p> Fusionner certaines variables réponses pour prédire uniquement des causes intéressantes et sur lesquels on pourrait agir (ex : fusionner 'Lightning' et 'Miscellaneous'), 
 									puis voir si cela améliore la prédiction</p></li>
+									<li><p> Peut-être aussi est-ce impossible de prédire la cause avec les variables disponibles (trop de variabilité) </p></li>
 								</ul>
 							</p>
 						 "
